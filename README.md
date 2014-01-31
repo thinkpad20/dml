@@ -84,7 +84,7 @@ At a high level, the DML syntax is as follows. At the outermost level is the str
 * DML expressions can be:
   * constants; for example: variables (which are constant because they are read from a data file), numbers, strings, lists, dictionaries, etc.
   * `if ... then ... else` statements
-  * case statements
+  * switching statements (`when foo.bar is 1 -> 'one' | 2 -> 'two' | 'some other number'`)
   * function calls
     * Function calls can be written prefix with `Foo(bar, baz)` or postfix with `bar.Foo(baz)`
   * function literals, written as a `|` separated list of one or more `<arg> -> <result>`s.
