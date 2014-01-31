@@ -79,14 +79,16 @@ At a high level, the DML syntax is as follows. At the outermost level is the str
     * Any assignments made in between two of these will not reprotagonist unless included in the export list.
     * Assignments to make right at the beginning can be put in a pair of curly braces after the `#begin` (and after any name given).
   * with the exception of `#note`, all directives starting with `#` are terminated by the end of the line.
-* The `\` followed by any whitespace character will remove all whitespace (in this case, the line break) until the first non-whitespace character (To render a ` \ `, use ` \\ `).
+* The `\` followed by any whitespace character will remove all whitespace (in this case, the line break) until the first non-whitespace character. To render a `\` followed by a space, use `\\ `.
 * A `$` initializes a DML expression. This can be either a single variable, in which case the dollar sign alone is sufficient (`$foo`), or a more complicated expression, in which case we need curly braces: `${Max(foo, bar.baz * 3)}`. If only a single variable is needed, no curly braces are required: `$foo.bar` is equivalent to `${foo.bar}`. If a literal dollar sign is needed, write it with `\$`.
 * DML expressions can be:
   * constants; for example: variables (which are constant because they are read from a data file), numbers, strings, lists, dictionaries, etc.
   * `if ... then ... else` statements
   * case statements
   * function calls
-  * definitions, which can be functions if they contain a `->`.
+    * Function calls can be written prefix with `Foo(bar, baz)` or postfix with `bar.Foo(baz)`
+  * function literals, written as a `|` separated list of one or more `<arg> -> <result>`s.
+  * definitions, mapping variable names to DML expressions
 * Strings in DML can themselves contain DML: for example, `I think ${if foo then 'the answer is ${foo + 3}' else 'nobody knows the answer'}.`
 * They can also contain a `@context <identifier>` directive, which means that any variable read should first be looked for as an attribute of `<identifier>`.
   * For example, if the data file contains `{"foo": {"bar": "Tom", "baz": "Dick"}, "qux": "Harry"}` and we have `@context foo`, then `$foo.bar introduced $baz to $qux` would render as "Tom introduced Dick to Harry".
@@ -98,6 +100,5 @@ At a high level, the DML syntax is as follows. At the outermost level is the str
     ${mylist.Filter(n -> n % 2 == 0).Map(RenderNumber).Enumerate}
     ```
   which will render as "My list contains 2 odd numbers: one and three".
-* Function calls can be written prefix with `Foo(bar, baz)` or postfix with `bar.Foo(baz)`
-* Typing is dynamic and somewhat loosey goosey. Don't go too crazy with it.
-* There's a large set of useful built-in library functions; for example the `Enumerate` function which renders a list in an English style: `Enumerate(['Tom','Dick','Harry'])` renders as `Tom, Dick, and Harry`, `Enumerate(['crime', 'punishment'])` renders as `crime and punishment`, etc. Of course, you can create these functions yourself if something is missing.
+* There's a large set of useful built-in library functions; for example the `Enumerate` function which renders a list in an English style: `Enumerate(['Tom','Dick','Harry'])` renders as `Tom, Dick, and Harry`, `Enumerate(['1', 2])` renders as `1 and 2`, etc. Of course, you can create these functions yourself if something is missing, as we did with the `RenderBd` and `RenderSibs` functions above.
+* Typing is dynamic and somewhat loosey goosey. But we can write functions which react to the types of their arguments, as we did with `RenderBd`.
