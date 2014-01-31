@@ -13,11 +13,19 @@ ${nom = if sex == 'male' then 'he' else 'she';
   pos = if sex == 'male' then 'his' else 'her';
   RenderBd = [year, month, day] -> '$month $day, $year'
            | [year, month] -> 'some day in $month of $year'
-           | [year] -> 'some day in $year'}
+           | [year] -> 'some day in $year'
+           | birthday::str -> birthday;
+  RenderSibs = [] or none -> 'no siblings'
+             | sibs -> '$sibs.Length.RenderNumber siblings: ${Enumerate(sibs)}'}
 #end Aliases {export [nom, acc, pos]}
 
 #begin 'Main story', {@context protagonist}
-This is a story about $name. ${nickname or name} was born on ${RenderBd(birthday)}, which makes $acc ${if age > 50 then 'somewhat old' elif age < 20 'quite young' else 'an unremarkable age of $age'}. In any case, only just last year $nom was ${age - 1} years old, but $nom was already starting to ${if age < 50 then 'fear' else 'not care about'} $pos birthday.
+This is a story about $name, who had ${RenderSibs(siblings)}. ${nickname or
+name} was born on ${RenderBd(birthday)}, which makes $acc ${if age > 50
+then 'somewhat old' elif age < 20 'quite young' else 'an unremarkable \
+age of $age'}. In any case, only just last year $nom was ${age - 1} years \
+old, but $nom has already started to ${if age < 50 then 'fear' else
+'not care about'} $pos birthday.
 #end 'Main story'
 ```
 
@@ -29,17 +37,15 @@ And we have this data dictionary:
     "name": "Allen"
     "sex": "male",
     "age": "28",
-    "birthday": ["1985", "April", "20"]
+    "birthday": ["1985", "April", "20"],
+    "siblings": ["Caroline", "Scott"]
   }
 }
 ```
 
 Then we'd render to this output:
 
-```
-
-This is a story about Allen. Allen was born on April 20, 1985, which makes him an unremarkable age of 28. In any case, only just last year he was 27, but he was already starting to fear his birthday.
-```
+> This is a story about Allen, who had two siblings: Caroline and Scott. Allen was born on April 20, 1985, which makes him an unremarkable age of 28. In any case, only just last year he was 27, but he has already started to fear his birthday.
 
 And with this input:
 
@@ -50,17 +56,14 @@ And with this input:
     "nickname": "Gabby",
     "sex": "female",
     "age": "56",
-    "birthday": ["1958"]
+    "birthday": "a cold morning in June of 1958"
   }
 }
 ```
 
 Then we'd get this output:
 
-```
-
-This is a story about Gabrielle. Gabby was born on some day in 1958, which makes her somewhat old. In any case, only just last year she was 55, but she was already starting to not care about her birthday.
-```
+> This is a story about Gabrielle, who had no siblings. Gabby was born on a cold morning in June of 1958, which makes her somewhat old. In any case, only just last year she was 55, but she has already started to not care about her birthday.
 
 ### Syntax
 
