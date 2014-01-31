@@ -1,6 +1,6 @@
 ## DML
 
-DML is a language for generating text files from static data. It is somewhat similar to moustache; however, it is able to operate on (though not modify) the data and make decisions about what it should write based on what is presented.
+DML is a language for generating text files from static data plus templates. It is somewhat similar to moustache; however, it is able to operate on (though not modify) the data and make decisions about what it should write based on what is presented, by allowing arbitrary logic.
 
 ### Example
 
@@ -69,11 +69,14 @@ At a high level, the DML syntax is as follows. At the outermost level is the str
 * Hash tag directives (`#`), all of which can be escaped by putting a `\` in front of the hash:
   * `#` starts a single-line comment IF followed by a space.
   * `#note` starts a block comment ending in `#endnote`.
-  * `#begin <name> <initializer>` and `#end <name> <exports>` introduce and end lexical scopes for aliases.
+  * `#import <filename>` will be replaced by the rendered contents of `<filename>`. This filename can also contain variables or functions which will be imported.
+  * `#begin <name?> <initializer?>` and `#end <name?> <exports?>` introduce and end lexical scopes for aliases.
     * The name is optional but if present will be checked for matched pairs.
     * The "initializer" is an arbitrary DML expression (see below), which won't be printed (so it's useful for variable assignments).
     * Any assignments made in between two of these will not reprotagonist unless included in the export list.
     * Assignments to make right at the beginning can be put in a pair of curly braces after the `#begin` (and after any name given).
+  * with the exception of `#note`, all directives starting with `#` are terminated by the end of the line.
+* The `\` followed by any whitespace character will remove all whitespace (in this case, the line break) until the first non-whitespace character (To render a ` \ `, use ` \\ `).
 * A `$` initializes a DML expression. This can be either a single variable, in which case the dollar sign alone is sufficient (`$foo`), or a more complicated expression, in which case we need curly braces: `${Max(foo, bar.baz * 3)}`. If only a single variable is needed, no curly braces are required: `$foo.bar` is equivalent to `${foo.bar}`. If a literal dollar sign is needed, write it with `\$`.
 * DML expressions can be:
   * constants; for example: variables (which are constant because they are read from a data file), numbers, strings, lists, dictionaries, etc.
@@ -88,9 +91,10 @@ At a high level, the DML syntax is as follows. At the outermost level is the str
 * DML expressions can deal with collections of objects as well. They can iterate over collections as well: if the data contains `"mylist": [1, 2, 3]` then we can write
 
     ```
-    My list contains ${mylist.Filter(n -> n % 2 == 1).Length} odd numbers: \_
+    My list contains ${mylist.Filter(n -> n % 2 == 1).Length} odd numbers: \
     ${mylist.Filter(n -> n % 2 == 0).Map(RenderNumber).Enumerate}
     ```
-  which will render as "My list contains 2 odd numbers: one and three". The `\_` is a whitespace skipper which will remove all whitespace (in this case, the line break) until the first non-whitespace character.
+  which will render as "My list contains 2 odd numbers: one and three".
 * Function calls can be written prefix with `Foo(bar, baz)` or postfix with `bar.Foo(baz)`
 * Typing is dynamic and somewhat loosey goosey. Don't go too crazy with it.
+* There's a large set of useful built-in library functions; for example the `Enumerate` function which renders a list in an English style: `Enumerate(['Tom','Dick','Harry'])` renders as `Tom, Dick, and Harry`, `Enumerate(['crime', 'punishment'])` renders as `crime and punishment`, etc. Of course, you can create these functions yourself if something is missing.
